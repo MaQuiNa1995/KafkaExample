@@ -30,7 +30,7 @@ Ten cuidado con las barras al copiar de la barra del explorer tienes que usar la
 # Ejecución Zookeeper
 Para ejecutar zookeeper podemos añadir la ruta RUTA_KAFKA/bin/windows a nuestro PATH para mayor comodidad
 
-Con el siguiente comando ejecutaremos el Zookeeper en windows: zookeeper-server-start.bat RUTA_KAFKA/config/zookeeper.properties
+Con el siguiente comando ejecutaremos el Zookeeper en windows: zookeeper-server-start.bat ../../config/zookeeper.properties
 
 Para saber que el despligue se llevo a cabo perfectamente tendríamos que ver en la consola un mensaje parecido a este: INFO binding to port 0.0.0.0/0.0.0.0:2181
 
@@ -41,7 +41,7 @@ Para que apunte a la carpeta que creamos anteriormente en mi caso: C:/Programas/
 Ten cuidado nuevamente con las barras al copiar de la barra del explorer tienes que usar las de la tecla 7 ( / )
 
 # Ejecución Kafka
-Con el siguiente comando ejecutaremos el Kafka en windows: kafka-server-start.bat RUTA_KAFKA/config/server.properties
+Con el siguiente comando ejecutaremos el Kafka en windows: kafka-server-start.bat ../../config/server.properties
 
 Para ver si está bien desplegado tendremos qe fijarnos en la consola un mensaje parecido a este: INFO [KafkaServer id=0] started
 
