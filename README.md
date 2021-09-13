@@ -30,7 +30,7 @@ Ten cuidado con las barras al copiar de la barra del explorer tienes que usar la
 # Ejecución Zookeeper
 Para ejecutar zookeeper podemos añadir la ruta RUTA_KAFKA/bin/windows a nuestro PATH para mayor comodidad
 
-Con el siguiente comando ejecutaremos el Zookeeper en windows: zookeeper-server-start.bat RUTA_KAFKA/config/zookeeper.properties
+Con el siguiente comando ejecutaremos el Zookeeper en windows: zookeeper-server-start.bat ../../config/zookeeper.properties
 
 Para saber que el despligue se llevo a cabo perfectamente tendríamos que ver en la consola un mensaje parecido a este: INFO binding to port 0.0.0.0/0.0.0.0:2181
 
