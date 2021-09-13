@@ -5,29 +5,30 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import maquina1995.kafka.messages.CustomMessage;
 
 /**
  * Esta clase representa un comportamiento custom para manejar los resultados
- * asincronos de los mensajes que se envian a kafka
+ * asincronos de los mensajes que se envian a kafka usando un pojo
+ * {@link CustomMessage}
  * <p>
  * El constructor es por conveniencia mía para imprimir el mensaje por consola a
  * modo ejemplo no es obligatorio ni mucho menos
  * <p>
  * Los métodos se ejecutan según:
- * <li>Éxito: {@link CustomKafkaListener#onSuccess(SendResult)}</li>
- * <li>Problema: {@link CustomKafkaListener#onFailure(Throwable)}</li>
- * <p>
+ * <li>Éxito: {@link CustomPojoKafkaListener#onSuccess(SendResult)}</li>
+ * <li>Problema: {@link CustomPojoKafkaListener#onFailure(Throwable)}</li>
  * 
  * @author MaQuiNa1995
  */
 @Slf4j
 @RequiredArgsConstructor
-public class CustomKafkaListener implements ListenableFutureCallback<SendResult<String, String>> {
+public class CustomPojoKafkaListener implements ListenableFutureCallback<SendResult<String, CustomMessage>> {
 
-	private final String message;
+	private final CustomMessage message;
 
 	@Override
-	public void onSuccess(SendResult<String, String> result) {
+	public void onSuccess(SendResult<String, CustomMessage> result) {
 		log.info("Mensaje enviado= [ " + this.message + " ] con offset=[ " + result.getRecordMetadata()
 		        .offset() + " ]");
 	}

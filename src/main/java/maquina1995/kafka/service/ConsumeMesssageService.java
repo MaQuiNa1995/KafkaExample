@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import lombok.extern.slf4j.Slf4j;
 import maquina1995.kafka.configuration.KafkaTopicConfig;
 import maquina1995.kafka.constants.KafkaConstants;
+import maquina1995.kafka.messages.CustomMessage;
 
 /**
  * Podemos implementar varios listener para un determinado topic de kafka cada
@@ -34,24 +35,43 @@ public class ConsumeMesssageService {
 	        groupId = KafkaConstants.KAFKA_GROUP_ID)
 	public void receiveMessageFromExampleTopic(String message) {
 
-		log.info("[Listener-1] Mensaje recibido con grupo: " + KafkaConstants.KAFKA_GROUP_ID + " Topic: "
-		        + KafkaConstants.KAFKA_TOPIC_NAME + " Mensaje: " + message);
+		this.logMessage(1, message, KafkaConstants.KAFKA_TOPIC_NAME);
 	}
 
 	/**
 	 * Este listener se suscribe al topic indicado por:
-	 * {@value KafkaConstants#KAFKA_TOPIC_NAME_FILTER} y ademas usa un filtro custom
-	 * creado en el bean:
+	 * {@value KafkaConstants#KAFKA_TOPIC_NAME_WITH_FILTER} y ademas usa un filtro
+	 * custom creado en el bean:
 	 * {@link KafkaTopicConfig#filterKafkaListenerContainerFactory(org.springframework.kafka.core.ConsumerFactory)}
 	 * 
 	 * @param message mensaje filtrado recibido
 	 */
-	@KafkaListener(topics = KafkaConstants.KAFKA_TOPIC_NAME_FILTER,
+	@KafkaListener(topics = KafkaConstants.KAFKA_TOPIC_NAME_WITH_FILTER,
 	        containerFactory = "filterKafkaListenerContainerFactory")
 	public void listenWithFilter(String message) {
 
-		log.info("[Listener-2] Mensaje filtrado recibido con Grupo: " + KafkaConstants.KAFKA_GROUP_ID + " Topic: "
-		        + KafkaConstants.KAFKA_TOPIC_NAME_FILTER + " Mensaje: " + message);
+		this.logMessage(2, message, KafkaConstants.KAFKA_TOPIC_NAME_WITH_FILTER);
+	}
+
+	/**
+	 * Este listener se suscribe al topic indicado por:
+	 * {@value KafkaConstants#KAFKA_TOPIC_NAME_WITH_POJO} y ademas usa un filtro
+	 * custom creado en el bean:
+	 * {@link KafkaTopicConfig#filterKafkaListenerContainerFactory(org.springframework.kafka.core.ConsumerFactory)}
+	 * 
+	 * @param message mensaje filtrado recibido
+	 */
+	@KafkaListener(topics = KafkaConstants.KAFKA_TOPIC_NAME_WITH_POJO,
+	        containerFactory = "pojoKafkaListenerContainerFactory")
+	public void greetingListener(CustomMessage customMessage) {
+
+		this.logMessage(3, customMessage.toString(), KafkaConstants.KAFKA_TOPIC_NAME_WITH_POJO);
+	}
+
+	private void logMessage(int listenerNumber, String message, String topic) {
+
+		log.info("[Listener-" + listenerNumber + "] Mensaje recibido con grupo: " + KafkaConstants.KAFKA_GROUP_ID
+		        + " Topic: " + topic + " Mensaje: " + message);
 	}
 
 }

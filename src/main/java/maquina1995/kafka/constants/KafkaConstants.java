@@ -6,9 +6,12 @@ import lombok.experimental.UtilityClass;
 public class KafkaConstants {
 
 	// Topics
-	public final String KAFKA_TOPIC_NAME = "Maquina-Topic";
-	public final String KAFKA_TOPIC_NAME_FILTER = "Maquina-Topic-Filter";
+	private final String DEFAULT_TOPIC = "Maqui-Topic";
+
+	public final String KAFKA_TOPIC_NAME = KafkaConstants.DEFAULT_TOPIC + "1";
+	public final String KAFKA_TOPIC_NAME_WITH_FILTER = KafkaConstants.DEFAULT_TOPIC + "2";
+	public final String KAFKA_TOPIC_NAME_WITH_POJO = KafkaConstants.DEFAULT_TOPIC + "3";
 
 	// Groups
-	public final String KAFKA_GROUP_ID = "Maquina-Group";
+	public final String KAFKA_GROUP_ID = "Maqui-Group";
 }

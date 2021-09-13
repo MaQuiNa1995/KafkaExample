@@ -12,8 +12,10 @@ import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import maquina1995.kafka.constants.KafkaConstants;
+import maquina1995.kafka.messages.CustomMessage;
 import maquina1995.kafka.service.ConsumeMesssageService;
 
 /**
@@ -21,11 +23,40 @@ import maquina1995.kafka.service.ConsumeMesssageService;
  * <li>{@link KafkaConsumerConfig#consumerFactory(String)}</li>
  * <li>{@link KafkaConsumerConfig#kafkaListenerContainerFactory()}</li>
  * <p>
- * y anotar nuestra clase con {@link EnableKafka} que sirve para la detección de
+ * Y anotar nuestra clase con {@link EnableKafka} que sirve para la detección de
  * beans de spring anotados con
  * {@link org.springframework.kafka.annotation.KafkaListener}
  * <p>
- * un ejemplo: {@link ConsumeMesssageService}
+ * Un ejemplo: {@link ConsumeMesssageService}
+ * <p>
+ * A continuación un indice visual de lo que tiene esta clase:
+ * <p>
+ * <table border="2">
+ * <tr align="center">
+ * <td>Tipo De Mensaje</td>
+ * <td>Con Filtro</td>
+ * <td>Bean {@link ConsumerFactory}</td>
+ * <td>Bean {@link ConcurrentKafkaListenerContainerFactory}</td>
+ * </tr>
+ * <tr align="center">
+ * <td>{@link String}</td>
+ * <td>No</td>
+ * <td>{@link KafkaConsumerConfig#consumerFactory(String)}</td>
+ * <td>{@link KafkaConsumerConfig#kafkaListenerContainerFactory(ConsumerFactory)}</td>
+ * </tr>
+ * <tr align="center">
+ * <td>{@link String}</td>
+ * <td>Si</td>
+ * <td>{@link KafkaConsumerConfig#consumerFactoryWithFilter(String)}</td>
+ * <td>{@link KafkaConsumerConfig#kafkaListenerContainerFactoryWithFilter(ConsumerFactory)}</td>
+ * </tr>
+ * <tr align="center">
+ * <td>{@link CustomMessage}</td>
+ * <td>No</td>
+ * <td>{@link KafkaConsumerConfig#consumerFactoryWithPojo(String)}</td>
+ * <td>{@link KafkaConsumerConfig#kafkaListenerContainerFactoryWithPojo(ConsumerFactory)}</td>
+ * </tr>
+ * </table>
  * 
  * @author MaQuiNa1995
  *
@@ -33,6 +64,8 @@ import maquina1995.kafka.service.ConsumeMesssageService;
 @Configuration
 @EnableKafka
 public class KafkaConsumerConfig {
+
+	// ---------------------- Consumer para String plano ---------------------
 
 	/**
 	 * Con este bean creamos la estrategia a seguir para crear los <b>Consumer
@@ -43,7 +76,8 @@ public class KafkaConsumerConfig {
 	 * @param bootstrapAddress valor de la property <b>kafka.bootstrapAddress</b>
 	 *                         inyectada desde el application.properties
 	 * 
-	 * @return {@link ConsumerFactory} configurado
+	 * @return {@link ConsumerFactory} < {@link String} , {@link String} >
+	 *         configurado
 	 */
 	@Bean
 	public ConsumerFactory<String, String> consumerFactory(
@@ -64,7 +98,8 @@ public class KafkaConsumerConfig {
 	 * @param consumerFactory bean de spring inyectado del contexto creado en
 	 *                        {@link KafkaConsumerConfig#consumerFactory(String)}
 	 *                        <p>
-	 * @return {@link ConcurrentKafkaListenerContainerFactory} configurado
+	 * @return {@link ConcurrentKafkaListenerContainerFactory} < {@link String} ,
+	 *         {@link String} > configurado
 	 */
 	@Bean
 	public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory(
@@ -76,6 +111,8 @@ public class KafkaConsumerConfig {
 		return factory;
 	}
 
+	// ------------ Consumer para String plano con filtro custom ------------
+
 	/**
 	 * Mismo bean que {@link KafkaConsumerConfig#consumerFactory(String)} pero al
 	 * que se le va a aplicar lógica de filtrado
@@ -83,14 +120,17 @@ public class KafkaConsumerConfig {
 	 * @param bootstrapAddress valor de la property <b>kafka.bootstrapAddress</b>
 	 *                         inyectada desde el application.properties
 	 * 
-	 * @return {@link ConsumerFactory} configurado
+	 * @return {@link ConsumerFactory} < {@link String} , {@link String} >
+	 *         configurado
 	 */
 	@Bean
 	public ConsumerFactory<String, String> consumerFactoryWithFilter(
 	        @Value(value = "${kafka.bootstrapAddress}") String bootstrapAddress) {
 
 		Map<String, Object> properties = new HashMap<>();
+		// Aqui se configura el puerto de kafka
 		properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
+		// Se configura el id del grupo al que se va a suscribir el consumer
 		properties.put(ConsumerConfig.GROUP_ID_CONFIG, KafkaConstants.KAFKA_GROUP_ID);
 		properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 		properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
@@ -102,9 +142,10 @@ public class KafkaConsumerConfig {
 	 * Este método crea la implementación por defecto de los listener de kafka
 	 * 
 	 * @param consumerFactory bean de spring inyectado del contexto creado en
-	 *                        {@link KafkaConsumerConfig#consumerFactory(String)}
+	 *                        {@link KafkaConsumerConfig#consumerFactoryWithFilter(String)}
 	 *                        <p>
-	 * @return {@link ConcurrentKafkaListenerContainerFactory} configurado
+	 * @return {@link ConcurrentKafkaListenerContainerFactory} < {@link String} ,
+	 *         {@link String} > configurado
 	 */
 	@Bean
 	public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactoryWithFilter(
@@ -113,6 +154,52 @@ public class KafkaConsumerConfig {
 		ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(consumerFactory);
 
+		return factory;
+	}
+
+	// -------------------- Consumer para Pojo ------------------------
+
+	/**
+	 * Mismo bean que {@link KafkaConsumerConfig#consumerFactory(String)} pero que
+	 * va a procesar un pojo {@link CustomMessage} en vez de una {@link String}
+	 * 
+	 * @param bootstrapAddress valor de la property <b>kafka.bootstrapAddress</b>
+	 *                         inyectada desde el application.properties
+	 * 
+	 * @return {@link ConsumerFactory} < {@link String} , {@link CustomMessage} >
+	 *         configurado
+	 */
+	@Bean
+	public ConsumerFactory<String, CustomMessage> consumerFactoryWithPojo(
+	        @Value(value = "${kafka.bootstrapAddress}") String bootstrapAddress) {
+
+		Map<String, Object> properties = new HashMap<>();
+		// Aqui se configura el puerto de kafka
+		properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
+		// Se configura el id del grupo al que se va a suscribir el consumer
+		properties.put(ConsumerConfig.GROUP_ID_CONFIG, KafkaConstants.KAFKA_GROUP_ID);
+		properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+		properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+
+		return new DefaultKafkaConsumerFactory<>(properties, new StringDeserializer(),
+		        new JsonDeserializer<>(CustomMessage.class));
+	}
+
+	/**
+	 * Este método crea la implementación por defecto de los listener de kafka
+	 * 
+	 * @param consumerFactory bean de spring inyectado del contexto creado en
+	 *                        {@link KafkaConsumerConfig#consumerFactoryWithPojo(String)}
+	 *                        <p>
+	 * @return {@link ConcurrentKafkaListenerContainerFactory} < {@link String} ,
+	 *         {@link CustomMessage} > configurado
+	 */
+	@Bean
+	public ConcurrentKafkaListenerContainerFactory<String, CustomMessage> kafkaListenerContainerFactoryWithPojo(
+	        ConsumerFactory<String, CustomMessage> consumerFactory) {
+
+		ConcurrentKafkaListenerContainerFactory<String, CustomMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
+		factory.setConsumerFactory(consumerFactory);
 		return factory;
 	}
 }

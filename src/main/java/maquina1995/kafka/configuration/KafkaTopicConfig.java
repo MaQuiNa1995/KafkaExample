@@ -15,6 +15,7 @@ import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.kafka.listener.adapter.RecordFilterStrategy;
 
 import maquina1995.kafka.constants.KafkaConstants;
+import maquina1995.kafka.messages.CustomMessage;
 
 /**
  * Para crear <b>topics de kafka</b> podemos recurrir a 2 estrategias:
@@ -30,6 +31,7 @@ import maquina1995.kafka.constants.KafkaConstants;
  * --create --zookeeper localhost:2181 --replication-factor 1 --partitions 1
  * --topic mytopic
  * <p>
+ * <b>Lecciones Aprendidas:</b> los nombres de los topic no deben tener espacios
  * 
  * @author MaQuiNa1995
  *
@@ -77,7 +79,7 @@ public class KafkaTopicConfig {
 	 */
 	@Bean
 	public NewTopic topic2() {
-		return TopicBuilder.name(KafkaConstants.KAFKA_TOPIC_NAME_FILTER)
+		return TopicBuilder.name(KafkaConstants.KAFKA_TOPIC_NAME_WITH_FILTER)
 		        .partitions(1)
 		        .replicas(1)
 		        .build();
@@ -93,7 +95,8 @@ public class KafkaTopicConfig {
 	 * Se ha configurado una regla de cargado del bean para que cuando esté la
 	 * property <b>custom.filter.enabled<b> a <b>true<b> se inyecte al contexto
 	 * 
-	 * @param consumerFactory {@link ConsumerFactory} inyectado en el contexto desde
+	 * @param consumerFactory {@link ConsumerFactory}< {@link String},
+	 *                        {@link String} > inyectado en el contexto desde
 	 *                        {@link KafkaConsumerConfig#consumerFactoryWithFilter(String)}
 	 *                        <p>
 	 * @return {@link ConcurrentKafkaListenerContainerFactory} configurado
@@ -109,14 +112,32 @@ public class KafkaTopicConfig {
 	}
 
 	/**
-	 * Este método crea una estrategia de filtrado para que solo acepte (en este
-	 * caso) los mensajes de kafka que sean iguales a un determinado valor en el
-	 * value osea en el mensaje
+	 * Configura el {@link ConsumerFactory} inyectado en spring para definir una/s
+	 * determinadas reglas de filtrado
 	 * <p>
-	 * Si, la descripcióne s correcta para esta condición: <b>!"Mensaje asincrono
-	 * con logica de filtrado".equals(kafkaRecord.value())</b>
+	 * En este caso la regla está definida en:
+	 * {@link KafkaTopicConfig#createCustomRecordFilterStrategy()}
+	 * 
+	 * @param consumerFactory {@link ConsumerFactory}< {@link String},
+	 *                        {@link CustomMessage} > inyectado en el contexto desde
+	 *                        {@link KafkaConsumerConfig#consumerFactoryWithPojo(String)}
+	 *                        <p>
+	 * @return {@link ConcurrentKafkaListenerContainerFactory} configurado
+	 */
+	@Bean
+	public ConcurrentKafkaListenerContainerFactory<String, CustomMessage> pojoKafkaListenerContainerFactory(
+	        ConsumerFactory<String, CustomMessage> consumerFactoryWithPojo) {
+
+		ConcurrentKafkaListenerContainerFactory<String, CustomMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
+		factory.setConsumerFactory(consumerFactoryWithPojo);
+		return factory;
+	}
+
+	/**
+	 * Este método crea una estrategia de filtrado en el que se descarta los casos
+	 * positivos de una determinada condición
 	 * <p>
-	 * Por asi decirlo la condición que tu definas en el lambda se niega
+	 * En este caso los mensajes que cumplan la condición se descartarían
 	 * 
 	 * @return {@link RecordFilterStrategy}< String, String > configurado
 	 */

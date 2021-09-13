@@ -10,12 +10,14 @@ import org.springframework.util.concurrent.ListenableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import maquina1995.kafka.constants.KafkaConstants;
-import maquina1995.kafka.listener.CustomKafkaListener;
+import maquina1995.kafka.listener.CustomPojoKafkaListener;
+import maquina1995.kafka.listener.CustomStringKafkaListener;
+import maquina1995.kafka.messages.CustomMessage;
 
 /**
  * Para enviar un mensaje a kafka tenemos 2 alternativas <br />
  * Asíncrona: {@link SendMessageService#sendAsynchronousMessage(String)} <br />
- * Síncrona: {@link SendMessageService#sendSynchronousMessage(String)}
+ * Síncrona: {@link SendMessageService#sendSynchronousStringMessage(String)}
  * 
  * @author MaQuiNa1995
  */
@@ -26,25 +28,49 @@ public class SendMessageService {
 
 	/**
 	 * Usamos este objeto inyectado del contexto para por ejemplo el envío de
-	 * mensajes a kafka
+	 * mensajes a kafka con {@link String}, {@link String}
 	 */
 	private final KafkaTemplate<String, String> kafkaTemplate;
+	/**
+	 * Usamos este objeto inyectado del contexto para por ejemplo el envío de
+	 * mensajes a kafka con {@link String}, {@link String}
+	 */
+	private final KafkaTemplate<String, CustomMessage> kafkaTemplateWithPojo;
 
 	/**
 	 * En este método al usar un listener custom podemos definir el comportamiento
-	 * de la recepción exitosa o no del envío: mas info en:
-	 * {@link CustomKafkaListener}
+	 * de la recepción exitosa o no del envío
 	 * 
-	 * @param asynchronousMessage mensaje a enviar a kafka
+	 * @see {@link CustomStringKafkaListener}
+	 * 
+	 * @param asynchronousMessage {@link String} a enviar a kafka
 	 * @param topic               topic al que enviar el mensaje
 	 */
-	public void sendAsynchronousMessage(String asynchronousMessage, String topic) {
+	public void sendAsynchronousStringMessage(String asynchronousMessage, String topic) {
 
-		// mensaje con topic para consumer sin filtrar
+		// mensaje con topic y mensaje formato String para consumer sin filtrar
 		ListenableFuture<SendResult<String, String>> asynchronousResult = kafkaTemplate.send(topic,
 		        asynchronousMessage);
 
-		asynchronousResult.addCallback(new CustomKafkaListener(asynchronousMessage));
+		asynchronousResult.addCallback(new CustomStringKafkaListener(asynchronousMessage));
+	}
+
+	/**
+	 * En este método al usar un listener custom podemos definir el comportamiento
+	 * de la recepción exitosa o no del envío
+	 * 
+	 * @see {@link CustomPojoKafkaListener}
+	 * 
+	 * @param customMessage {@link CustomMessage} a enviar a kafka
+	 * @param topic         topic al que enviar el mensaje
+	 */
+	public void sendAsynchronousPojoMessage(CustomMessage customMessage, String topic) {
+
+		// mensaje con topic y mensaje formato String para consumer con filtro
+		ListenableFuture<SendResult<String, CustomMessage>> asynchronousResult = kafkaTemplateWithPojo.send(topic,
+		        customMessage);
+
+		asynchronousResult.addCallback(new CustomPojoKafkaListener(customMessage));
 	}
 
 	/**
@@ -58,7 +84,8 @@ public class SendMessageService {
 	 * @throws ExecutionException
 	 * @throws InterruptedException
 	 */
-	public void sendSynchronousMessage(String synchronousMessage) throws InterruptedException, ExecutionException {
+	public void sendSynchronousStringMessage(String synchronousMessage)
+	        throws InterruptedException, ExecutionException {
 
 		ListenableFuture<SendResult<String, String>> listenableFuture = kafkaTemplate
 		        .send(KafkaConstants.KAFKA_TOPIC_NAME, synchronousMessage);
