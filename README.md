@@ -52,3 +52,7 @@ Como dato adicional el servidor por defecto de kafka es: 9092
 [Para hacer la guía](https://jd-bots.com/2021/08/14/start-zookeeper-and-kafka-in-windows-os/)
 
 [Para hacer el proyecto](https://www.baeldung.com/spring-kafka)
+
+# Diagrama Uml del proyecto
+
+![alt text](https://github.com/MaQuiNa1995/KafkaExample/blob/master/DiagramaUml.svg?raw=true)
