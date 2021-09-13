@@ -41,7 +41,7 @@ Para que apunte a la carpeta que creamos anteriormente en mi caso: C:/Programas/
 Ten cuidado nuevamente con las barras al copiar de la barra del explorer tienes que usar las de la tecla 7 ( / )
 
 # Ejecución Kafka
-Con el siguiente comando ejecutaremos el Kafka en windows: kafka-server-start.bat RUTA_KAFKA/config/server.properties
+Con el siguiente comando ejecutaremos el Kafka en windows: kafka-server-start.bat ../../config/server.properties
 
 Para ver si está bien desplegado tendremos qe fijarnos en la consola un mensaje parecido a este: INFO [KafkaServer id=0] started
 
