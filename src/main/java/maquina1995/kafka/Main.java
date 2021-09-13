@@ -5,8 +5,11 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import lombok.extern.slf4j.Slf4j;
+import maquina1995.kafka.constants.KafkaConstants;
 import maquina1995.kafka.service.SendMessageService;
 
+@Slf4j
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 
@@ -19,11 +22,13 @@ public class Main implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
-		System.out.println("Inicio Aplicacion");
 
-		sendMessageService.sendAsynchronousMessage("Mensaje asincrono :)");
+		log.info("Envío mensaje asíncrono con topic: " + KafkaConstants.KAFKA_TOPIC_NAME);
+		sendMessageService.sendAsynchronousMessage("Mensaje asincrono", KafkaConstants.KAFKA_TOPIC_NAME);
 
-		System.out.println("Fin Aplicacion");
+		log.info("Envío mensaje asíncrono con topic: " + KafkaConstants.KAFKA_TOPIC_NAME_FILTER);
+		sendMessageService.sendAsynchronousMessage("Mensaje asincrono con logica de filtrado",
+		        KafkaConstants.KAFKA_TOPIC_NAME_FILTER);
 	}
 
 }

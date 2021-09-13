@@ -24,7 +24,8 @@ public class KafkaProducerConfig {
 	 * tanto es recomendable que solo haya una instancia de el en el programa (Como
 	 * tenemos aqui que el bean es singleton)
 	 * 
-	 * @param bootstrapAddress
+	 * @param bootstrapAddress valor de la property <b>kafka.bootstrapAddress</b>
+	 *                         inyectada desde el application.properties
 	 * 
 	 * @return
 	 */

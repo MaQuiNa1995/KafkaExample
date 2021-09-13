@@ -1,12 +1,14 @@
 package maquina1995.kafka.constants;
 
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
 public class KafkaConstants {
 
-	public static final String KAFKA_TOPIC_EXAMPLE = "Maquina-Topic";
-	public static final String KAFKA_GROUP_ID = "Maquina-Group";
+	// Topics
+	public final String KAFKA_TOPIC_NAME = "Maquina-Topic";
+	public final String KAFKA_TOPIC_NAME_FILTER = "Maquina-Topic-Filter";
 
-	private KafkaConstants() {
-		throw new IllegalStateException("No puedes instanciar esta clase");
-
-	}
+	// Groups
+	public final String KAFKA_GROUP_ID = "Maquina-Group";
 }

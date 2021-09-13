@@ -3,6 +3,9 @@ package maquina1995.kafka.listener;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 /**
  * Esta clase representa un comportamiento custom para manejar los resultados
  * asincronos de los mensajes que se envian a kafka
@@ -17,23 +20,20 @@ import org.springframework.util.concurrent.ListenableFutureCallback;
  * 
  * @author MaQuiNa1995
  */
+@Slf4j
+@RequiredArgsConstructor
 public class CustomKafkaListener implements ListenableFutureCallback<SendResult<String, String>> {
 
 	private final String message;
 
-	public CustomKafkaListener(String message) {
-		super();
-		this.message = message;
-	}
-
 	@Override
 	public void onSuccess(SendResult<String, String> result) {
-		System.out.println("Mensaje enviado= [ " + this.message + " ] con offset=[ " + result.getRecordMetadata()
+		log.info("Mensaje enviado= [ " + this.message + " ] con offset=[ " + result.getRecordMetadata()
 		        .offset() + " ]");
 	}
 
 	@Override
-	public void onFailure(Throwable ex) {
-		System.out.println("No se puede enviar el mensaje =[" + this.message + "] porque: " + ex.getMessage());
+	public void onFailure(Throwable exception) {
+		log.info("No se puede enviar el mensaje =[" + this.message + "] porque: " + exception.getMessage());
 	}
 }

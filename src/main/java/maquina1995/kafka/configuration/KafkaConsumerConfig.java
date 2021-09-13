@@ -40,9 +40,10 @@ public class KafkaConsumerConfig {
 	 * cluster de kafka
 	 * <p>
 	 * 
-	 * @param bootstrapAddress
+	 * @param bootstrapAddress valor de la property <b>kafka.bootstrapAddress</b>
+	 *                         inyectada desde el application.properties
 	 * 
-	 * @return
+	 * @return {@link ConsumerFactory} configurado
 	 */
 	@Bean
 	public ConsumerFactory<String, String> consumerFactory(
@@ -62,10 +63,51 @@ public class KafkaConsumerConfig {
 	 * 
 	 * @param consumerFactory bean de spring inyectado del contexto creado en
 	 *                        {@link KafkaConsumerConfig#consumerFactory(String)}
-	 * @return
+	 *                        <p>
+	 * @return {@link ConcurrentKafkaListenerContainerFactory} configurado
 	 */
 	@Bean
 	public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory(
+	        ConsumerFactory<String, String> consumerFactory) {
+
+		ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
+		factory.setConsumerFactory(consumerFactory);
+
+		return factory;
+	}
+
+	/**
+	 * Mismo bean que {@link KafkaConsumerConfig#consumerFactory(String)} pero al
+	 * que se le va a aplicar lógica de filtrado
+	 * 
+	 * @param bootstrapAddress valor de la property <b>kafka.bootstrapAddress</b>
+	 *                         inyectada desde el application.properties
+	 * 
+	 * @return {@link ConsumerFactory} configurado
+	 */
+	@Bean
+	public ConsumerFactory<String, String> consumerFactoryWithFilter(
+	        @Value(value = "${kafka.bootstrapAddress}") String bootstrapAddress) {
+
+		Map<String, Object> properties = new HashMap<>();
+		properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
+		properties.put(ConsumerConfig.GROUP_ID_CONFIG, KafkaConstants.KAFKA_GROUP_ID);
+		properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+		properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+
+		return new DefaultKafkaConsumerFactory<>(properties);
+	}
+
+	/**
+	 * Este método crea la implementación por defecto de los listener de kafka
+	 * 
+	 * @param consumerFactory bean de spring inyectado del contexto creado en
+	 *                        {@link KafkaConsumerConfig#consumerFactory(String)}
+	 *                        <p>
+	 * @return {@link ConcurrentKafkaListenerContainerFactory} configurado
+	 */
+	@Bean
+	public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactoryWithFilter(
 	        ConsumerFactory<String, String> consumerFactory) {
 
 		ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
