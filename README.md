@@ -56,3 +56,5 @@ Como dato adicional el servidor por defecto de kafka es: 9092
 # Diagrama Uml del proyecto
 
 ![alt text](https://github.com/MaQuiNa1995/KafkaExample/blob/master/DiagramaUml.svg?raw=true)
+
+Imagen creada con: https://github.com/MaQuiNa1995/ExtractorUml
