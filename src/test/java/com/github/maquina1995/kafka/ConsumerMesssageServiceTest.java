@@ -2,16 +2,19 @@ package com.github.maquina1995.kafka;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.support.SendResult;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.util.concurrent.ListenableFuture;
 
 import com.github.maquina1995.kafka.constants.KafkaConstants;
 import com.github.maquina1995.kafka.messages.CustomMessage;
+import com.github.maquina1995.kafka.service.ConsumerMesssageService;
 
 @SpringBootTest
 @DirtiesContext
@@ -21,32 +24,33 @@ import com.github.maquina1995.kafka.messages.CustomMessage;
         topics = { KafkaConstants.KAFKA_TOPIC_NAME })
 class ConsumerMesssageServiceTest {
 
+	@SpyBean
+	private ConsumerMesssageService consumerMesssageService;
+
 	@Autowired
 	private KafkaTemplate<String, CustomMessage> template;
 
-//	@Autowired
-//	private KafkaConsumer consumer;
-//
-//	@Autowired
-//	private KafkaProducer producer;
+	@Captor
+	private ArgumentCaptor<CustomMessage> argumentCaptor;
 
 	@Test
-	void givenEmbeddedKafkaBroker_whenSendingtoSimpleProducer_thenMessageReceived() throws Exception {
-		String expectedMessage = "test";
+	void consumerListenerTest() throws Exception {
 
-		
-		
-		ListenableFuture<SendResult<String, CustomMessage>> consumerResponse = template
-		        .send(KafkaConstants.KAFKA_TOPIC_NAME, CustomMessage.builder()
-		                .message(expectedMessage)
-		                .build());
+		// Given
+		CustomMessage customMessage = CustomMessage.builder()
+		        .message("test")
+		        .build();
 
-		String actualMessage = consumerResponse.get()
-		        .getProducerRecord()
-		        .value()
-		        .getMessage();
+		// When
+		template.send(KafkaConstants.KAFKA_TOPIC_NAME_WITH_POJO, customMessage);
 
-		Assertions.assertEquals(expectedMessage, actualMessage);
+		// Then
+		Mockito.verify(consumerMesssageService, Mockito.times(1))
+		        .greetingListener(customMessage);
+		Mockito.verify(consumerMesssageService)
+		        .greetingListener(argumentCaptor.capture());
+		Assertions.assertEquals(customMessage, argumentCaptor.getValue());
+
 	}
 }
 //@EmbeddedKafka(partitions = 1,
