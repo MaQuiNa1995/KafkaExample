@@ -1,4 +1,4 @@
-package maquina1995.kafka.configuration;
+package com.github.maquina1995.kafka.configuration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,8 +14,8 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.kafka.listener.adapter.RecordFilterStrategy;
 
-import maquina1995.kafka.constants.KafkaConstants;
-import maquina1995.kafka.messages.CustomMessage;
+import com.github.maquina1995.kafka.constants.KafkaConstants;
+import com.github.maquina1995.kafka.messages.CustomMessage;
 
 /**
  * Para crear <b>topics de kafka</b> podemos recurrir a 2 estrategias:

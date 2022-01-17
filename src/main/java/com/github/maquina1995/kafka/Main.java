@@ -1,14 +1,15 @@
-package maquina1995.kafka;
+package com.github.maquina1995.kafka;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.github.maquina1995.kafka.constants.KafkaConstants;
+import com.github.maquina1995.kafka.messages.CustomMessage;
+import com.github.maquina1995.kafka.service.ProducerMessageService;
+
 import lombok.extern.slf4j.Slf4j;
-import maquina1995.kafka.constants.KafkaConstants;
-import maquina1995.kafka.messages.CustomMessage;
-import maquina1995.kafka.service.SendMessageService;
 
 @Slf4j
 @SpringBootApplication
@@ -19,7 +20,7 @@ public class Main implements CommandLineRunner {
 	}
 
 	@Autowired
-	private SendMessageService sendMessageService;
+	private ProducerMessageService sendMessageService;
 
 	@Override
 	public void run(String... args) {

@@ -1,11 +1,12 @@
-package maquina1995.kafka.listener;
+package com.github.maquina1995.kafka.listener;
 
 import org.springframework.kafka.support.SendResult;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
+import com.github.maquina1995.kafka.messages.CustomMessage;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import maquina1995.kafka.messages.CustomMessage;
 
 /**
  * Esta clase representa un comportamiento custom para manejar los resultados

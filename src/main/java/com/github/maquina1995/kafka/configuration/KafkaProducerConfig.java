@@ -1,4 +1,4 @@
-package maquina1995.kafka.configuration;
+package com.github.maquina1995.kafka.configuration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,7 +13,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
-import maquina1995.kafka.messages.CustomMessage;
+import com.github.maquina1995.kafka.messages.CustomMessage;
 
 /**
  * Clase para enseñar la configuración relacionada a los Producer de kafka (Que

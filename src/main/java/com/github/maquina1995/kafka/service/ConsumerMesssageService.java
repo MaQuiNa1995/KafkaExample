@@ -1,12 +1,13 @@
-package maquina1995.kafka.service;
+package com.github.maquina1995.kafka.service;
 
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Service;
 
+import com.github.maquina1995.kafka.configuration.KafkaTopicConfig;
+import com.github.maquina1995.kafka.constants.KafkaConstants;
+import com.github.maquina1995.kafka.messages.CustomMessage;
+
 import lombok.extern.slf4j.Slf4j;
-import maquina1995.kafka.configuration.KafkaTopicConfig;
-import maquina1995.kafka.constants.KafkaConstants;
-import maquina1995.kafka.messages.CustomMessage;
 
 /**
  * Podemos implementar varios listener para un determinado topic de kafka cada
@@ -23,7 +24,7 @@ import maquina1995.kafka.messages.CustomMessage;
  */
 @Slf4j
 @Service
-public class ConsumeMesssageService {
+public class ConsumerMesssageService {
 
 	/**
 	 * Este listener se suscribe al topic indicado por:

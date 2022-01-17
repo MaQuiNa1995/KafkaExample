@@ -1,4 +1,4 @@
-package maquina1995.kafka.messages;
+package com.github.maquina1995.kafka.messages;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;

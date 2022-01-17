@@ -1,4 +1,4 @@
-package maquina1995.kafka.configuration;
+package com.github.maquina1995.kafka.configuration;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,9 +14,9 @@ import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
-import maquina1995.kafka.constants.KafkaConstants;
-import maquina1995.kafka.messages.CustomMessage;
-import maquina1995.kafka.service.ConsumeMesssageService;
+import com.github.maquina1995.kafka.constants.KafkaConstants;
+import com.github.maquina1995.kafka.messages.CustomMessage;
+import com.github.maquina1995.kafka.service.ConsumerMesssageService;
 
 /**
  * Para poder consumir mensajes de kafka necesitamos crear los siguientes beans
@@ -27,7 +27,7 @@ import maquina1995.kafka.service.ConsumeMesssageService;
  * beans de spring anotados con
  * {@link org.springframework.kafka.annotation.KafkaListener}
  * <p>
- * Un ejemplo: {@link ConsumeMesssageService}
+ * Un ejemplo: {@link ConsumerMesssageService}
  * <p>
  * A continuación un indice visual de lo que tiene esta clase:
  * <p>
@@ -65,6 +65,9 @@ import maquina1995.kafka.service.ConsumeMesssageService;
 @EnableKafka
 public class KafkaConsumerConfig {
 
+	@Value(value = "${kafka.bootstrapAddress}")
+	private String bootstrapAddress;
+
 	// ---------------------- Consumer para String plano ---------------------
 
 	/**
@@ -80,14 +83,9 @@ public class KafkaConsumerConfig {
 	 *         configurado
 	 */
 	@Bean
-	public ConsumerFactory<String, String> consumerFactory(
-	        @Value(value = "${kafka.bootstrapAddress}") String bootstrapAddress) {
+	public ConsumerFactory<String, String> consumerFactory() {
 
-		Map<String, Object> properties = new HashMap<>();
-		properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
-		properties.put(ConsumerConfig.GROUP_ID_CONFIG, KafkaConstants.KAFKA_GROUP_ID);
-		properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-		properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+		Map<String, Object> properties = this.createKafkaProperties();
 
 		return new DefaultKafkaConsumerFactory<>(properties);
 	}
@@ -124,16 +122,9 @@ public class KafkaConsumerConfig {
 	 *         configurado
 	 */
 	@Bean
-	public ConsumerFactory<String, String> consumerFactoryWithFilter(
-	        @Value(value = "${kafka.bootstrapAddress}") String bootstrapAddress) {
+	public ConsumerFactory<String, String> consumerFactoryWithFilter() {
 
-		Map<String, Object> properties = new HashMap<>();
-		// Aqui se configura el puerto de kafka
-		properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
-		// Se configura el id del grupo al que se va a suscribir el consumer
-		properties.put(ConsumerConfig.GROUP_ID_CONFIG, KafkaConstants.KAFKA_GROUP_ID);
-		properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-		properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+		Map<String, Object> properties = this.createKafkaProperties();
 
 		return new DefaultKafkaConsumerFactory<>(properties);
 	}
@@ -170,16 +161,9 @@ public class KafkaConsumerConfig {
 	 *         configurado
 	 */
 	@Bean
-	public ConsumerFactory<String, CustomMessage> consumerFactoryWithPojo(
-	        @Value(value = "${kafka.bootstrapAddress}") String bootstrapAddress) {
+	public ConsumerFactory<String, CustomMessage> consumerFactoryWithPojo() {
 
-		Map<String, Object> properties = new HashMap<>();
-		// Aqui se configura el puerto de kafka
-		properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
-		// Se configura el id del grupo al que se va a suscribir el consumer
-		properties.put(ConsumerConfig.GROUP_ID_CONFIG, KafkaConstants.KAFKA_GROUP_ID);
-		properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-		properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+		Map<String, Object> properties = createKafkaProperties();
 
 		return new DefaultKafkaConsumerFactory<>(properties, new StringDeserializer(),
 		        new JsonDeserializer<>(CustomMessage.class));
@@ -201,5 +185,22 @@ public class KafkaConsumerConfig {
 		ConcurrentKafkaListenerContainerFactory<String, CustomMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(consumerFactory);
 		return factory;
+	}
+
+	/**
+	 * Creación de las properties de kafka
+	 * 
+	 * @param bootstrapAddress
+	 * @return
+	 */
+	private Map<String, Object> createKafkaProperties() {
+		Map<String, Object> properties = new HashMap<>();
+		// Aqui se configura el puerto de kafka
+		properties.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
+		// Se configura el id del grupo al que se va a suscribir el consumer
+		properties.put(ConsumerConfig.GROUP_ID_CONFIG, KafkaConstants.KAFKA_GROUP_ID);
+		properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+		properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+		return properties;
 	}
 }

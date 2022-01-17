@@ -1,4 +1,4 @@
-package maquina1995.kafka.service;
+package com.github.maquina1995.kafka.service;
 
 import java.util.concurrent.ExecutionException;
 
@@ -7,24 +7,25 @@ import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Service;
 import org.springframework.util.concurrent.ListenableFuture;
 
+import com.github.maquina1995.kafka.constants.KafkaConstants;
+import com.github.maquina1995.kafka.listener.CustomPojoKafkaListener;
+import com.github.maquina1995.kafka.listener.CustomStringKafkaListener;
+import com.github.maquina1995.kafka.messages.CustomMessage;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import maquina1995.kafka.constants.KafkaConstants;
-import maquina1995.kafka.listener.CustomPojoKafkaListener;
-import maquina1995.kafka.listener.CustomStringKafkaListener;
-import maquina1995.kafka.messages.CustomMessage;
 
 /**
  * Para enviar un mensaje a kafka tenemos 2 alternativas <br />
- * Asíncrona: {@link SendMessageService#sendAsynchronousMessage(String)} <br />
- * Síncrona: {@link SendMessageService#sendSynchronousStringMessage(String)}
+ * Asíncrona: {@link ProducerMessageService#sendAsynchronousMessage(String)} <br />
+ * Síncrona: {@link ProducerMessageService#sendSynchronousStringMessage(String)}
  * 
  * @author MaQuiNa1995
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SendMessageService {
+public class ProducerMessageService {
 
 	/**
 	 * Usamos este objeto inyectado del contexto para por ejemplo el envío de

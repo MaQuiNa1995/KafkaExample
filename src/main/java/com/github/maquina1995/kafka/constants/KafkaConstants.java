@@ -1,4 +1,4 @@
-package maquina1995.kafka.constants;
+package com.github.maquina1995.kafka.constants;
 
 import lombok.experimental.UtilityClass;
 

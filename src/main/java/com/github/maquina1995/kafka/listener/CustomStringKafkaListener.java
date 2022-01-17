@@ -1,4 +1,4 @@
-package maquina1995.kafka.listener;
+package com.github.maquina1995.kafka.listener;
 
 import org.springframework.kafka.support.SendResult;
 import org.springframework.util.concurrent.ListenableFutureCallback;
