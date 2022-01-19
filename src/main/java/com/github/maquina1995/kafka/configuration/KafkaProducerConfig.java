@@ -13,7 +13,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
 
-import com.github.maquina1995.kafka.messages.CustomMessage;
+import com.github.maquina1995.kafka.entity.MessageLog;
 
 /**
  * Clase para enseñar la configuración relacionada a los Producer de kafka (Que
@@ -68,18 +68,18 @@ public class KafkaProducerConfig {
 
 	/**
 	 * Creamos este bean para poder mandar mensajes con un determinado pojo en este
-	 * caso {@link CustomMessage}
+	 * caso {@link Message}
 	 * <p>
 	 * Funciona igual que {@link KafkaProducerConfig#producerFactory} solo que este
-	 * no maneja mensajes con {@link String} planos sino con {@link CustomMessage}
+	 * no maneja mensajes con {@link String} planos sino con {@link Message}
 	 * 
 	 * @param bootstrapAddress valor de la property <b>kafka.bootstrapAddress</b>
 	 *                         inyectada desde el application.properties
-	 * @return {@link ProducerFactory} < {@link String}, {@link CustomMessage} >
+	 * @return {@link ProducerFactory} < {@link String}, {@link Message} >
 	 *         configurado
 	 */
 	@Bean
-	public ProducerFactory<String, CustomMessage> customPojoProducerFactory(
+	public ProducerFactory<String, MessageLog> customPojoProducerFactory(
 	        @Value(value = "${kafka.bootstrapAddress}") String bootstrapAddress) {
 
 		Map<String, Object> configProps = new HashMap<>(3);
@@ -91,16 +91,16 @@ public class KafkaProducerConfig {
 
 	/**
 	 * Funciona igual que {@link KafkaProducerConfig#kafkaTemplate(ProducerFactory)}
-	 * peo en vez de con {@link String} con {@link CustomMessage}
+	 * peo en vez de con {@link String} con {@link Message}
 	 * 
 	 * @param producerFactory bean obtenido del contexto de spring que hace
 	 *                        referencia al return de
 	 *                        {@link KafkaProducerConfig#customPojoProducerFactory(String)}
-	 * @return {@link KafkaTemplate} < {@link String} , {@link CustomMessage} >
+	 * @return {@link KafkaTemplate} < {@link String} , {@link Message} >
 	 */
 	@Bean
-	public KafkaTemplate<String, CustomMessage> kafkaTemplateWithCustomPojo(
-	        ProducerFactory<String, CustomMessage> producerFactory) {
+	public KafkaTemplate<String, MessageLog> kafkaTemplateWithCustomPojo(
+	        ProducerFactory<String, MessageLog> producerFactory) {
 		return new KafkaTemplate<>(producerFactory);
 	}
 }

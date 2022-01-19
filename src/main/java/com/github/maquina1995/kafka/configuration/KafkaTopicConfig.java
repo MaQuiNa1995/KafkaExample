@@ -15,7 +15,7 @@ import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.kafka.listener.adapter.RecordFilterStrategy;
 
 import com.github.maquina1995.kafka.constants.KafkaConstants;
-import com.github.maquina1995.kafka.messages.CustomMessage;
+import com.github.maquina1995.kafka.entity.MessageLog;
 
 /**
  * Para crear <b>topics de kafka</b> podemos recurrir a 2 estrategias:
@@ -119,16 +119,16 @@ public class KafkaTopicConfig {
 	 * {@link KafkaTopicConfig#createCustomRecordFilterStrategy()}
 	 * 
 	 * @param consumerFactory {@link ConsumerFactory}< {@link String},
-	 *                        {@link CustomMessage} > inyectado en el contexto desde
+	 *                        {@link MessageLog} > inyectado en el contexto desde
 	 *                        {@link KafkaConsumerConfig#consumerFactoryWithPojo(String)}
 	 *                        <p>
 	 * @return {@link ConcurrentKafkaListenerContainerFactory} configurado
 	 */
 	@Bean
-	public ConcurrentKafkaListenerContainerFactory<String, CustomMessage> pojoKafkaListenerContainerFactory(
-	        ConsumerFactory<String, CustomMessage> consumerFactoryWithPojo) {
+	public ConcurrentKafkaListenerContainerFactory<String, MessageLog> pojoKafkaListenerContainerFactory(
+	        ConsumerFactory<String, MessageLog> consumerFactoryWithPojo) {
 
-		ConcurrentKafkaListenerContainerFactory<String, CustomMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
+		ConcurrentKafkaListenerContainerFactory<String, MessageLog> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(consumerFactoryWithPojo);
 		return factory;
 	}

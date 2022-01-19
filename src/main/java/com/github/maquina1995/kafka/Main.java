@@ -6,7 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.github.maquina1995.kafka.constants.KafkaConstants;
-import com.github.maquina1995.kafka.messages.CustomMessage;
+import com.github.maquina1995.kafka.entity.MessageLog;
 import com.github.maquina1995.kafka.service.ProducerMessageService;
 
 import lombok.extern.slf4j.Slf4j;
@@ -24,14 +24,12 @@ public class Main implements CommandLineRunner {
 
 	@Override
 	public void run(String... args) {
-		this.sendString();
-		this.sendPojo();
+//		this.sendString();
+//		this.sendPojo();
 	}
 
 	private void sendPojo() {
-		CustomMessage customMessage = CustomMessage.builder()
-		        .message("Mensaje asincrono contenido en un pojo")
-		        .build();
+		MessageLog customMessage = new MessageLog("Mensaje asincrono contenido en un pojo");
 
 		log.info("Envío de pojo asíncrono con topic: " + KafkaConstants.KAFKA_TOPIC_NAME_WITH_POJO);
 		sendMessageService.sendAsynchronousPojoMessage(customMessage, KafkaConstants.KAFKA_TOPIC_NAME_WITH_POJO);

@@ -5,8 +5,10 @@ import org.springframework.stereotype.Service;
 
 import com.github.maquina1995.kafka.configuration.KafkaTopicConfig;
 import com.github.maquina1995.kafka.constants.KafkaConstants;
-import com.github.maquina1995.kafka.messages.CustomMessage;
+import com.github.maquina1995.kafka.entity.MessageLog;
+import com.github.maquina1995.kafka.repository.MessageLogRepository;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -24,7 +26,10 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ConsumerMesssageService {
+
+	private final MessageLogRepository messageLogRepository;
 
 	/**
 	 * Este listener se suscribe al topic indicado por:
@@ -64,12 +69,16 @@ public class ConsumerMesssageService {
 	 */
 	@KafkaListener(topics = KafkaConstants.KAFKA_TOPIC_NAME_WITH_POJO,
 	        containerFactory = "pojoKafkaListenerContainerFactory")
-	public void greetingListener(CustomMessage customMessage) {
+	public void greetingListener(MessageLog customMessage) {
 
-		this.logMessage(3, customMessage.toString(), KafkaConstants.KAFKA_TOPIC_NAME_WITH_POJO);
+		this.logMessage(3, customMessage.getMessage(), KafkaConstants.KAFKA_TOPIC_NAME_WITH_POJO);
 	}
 
 	private void logMessage(int listenerNumber, String message, String topic) {
+
+		MessageLog messageLog = new MessageLog(message);
+
+		messageLogRepository.save(messageLog);
 
 		log.info("[Listener-" + listenerNumber + "] Mensaje recibido con grupo: " + KafkaConstants.KAFKA_GROUP_ID
 		        + " Topic: " + topic + " Mensaje: " + message);

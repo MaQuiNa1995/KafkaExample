@@ -3,7 +3,7 @@ package com.github.maquina1995.kafka.listener;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.util.concurrent.ListenableFutureCallback;
 
-import com.github.maquina1995.kafka.messages.CustomMessage;
+import com.github.maquina1995.kafka.entity.MessageLog;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Esta clase representa un comportamiento custom para manejar los resultados
  * asincronos de los mensajes que se envian a kafka usando un pojo
- * {@link CustomMessage}
+ * {@link Message}
  * <p>
  * El constructor es por conveniencia mía para imprimir el mensaje por consola a
  * modo ejemplo no es obligatorio ni mucho menos
@@ -24,12 +24,12 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 @RequiredArgsConstructor
-public class CustomPojoKafkaListener implements ListenableFutureCallback<SendResult<String, CustomMessage>> {
+public class CustomPojoKafkaListener implements ListenableFutureCallback<SendResult<String, MessageLog>> {
 
-	private final CustomMessage message;
+	private final MessageLog message;
 
 	@Override
-	public void onSuccess(SendResult<String, CustomMessage> result) {
+	public void onSuccess(SendResult<String, MessageLog> result) {
 		log.info("Mensaje enviado= [ " + this.message + " ] con offset=[ " + result.getRecordMetadata()
 		        .offset() + " ]");
 	}

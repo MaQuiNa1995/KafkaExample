@@ -15,7 +15,7 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import com.github.maquina1995.kafka.constants.KafkaConstants;
-import com.github.maquina1995.kafka.messages.CustomMessage;
+import com.github.maquina1995.kafka.entity.MessageLog;
 import com.github.maquina1995.kafka.service.ConsumerMesssageService;
 
 /**
@@ -51,7 +51,7 @@ import com.github.maquina1995.kafka.service.ConsumerMesssageService;
  * <td>{@link KafkaConsumerConfig#kafkaListenerContainerFactoryWithFilter(ConsumerFactory)}</td>
  * </tr>
  * <tr align="center">
- * <td>{@link CustomMessage}</td>
+ * <td>{@link Message}</td>
  * <td>No</td>
  * <td>{@link KafkaConsumerConfig#consumerFactoryWithPojo(String)}</td>
  * <td>{@link KafkaConsumerConfig#kafkaListenerContainerFactoryWithPojo(ConsumerFactory)}</td>
@@ -152,21 +152,21 @@ public class KafkaConsumerConfig {
 
 	/**
 	 * Mismo bean que {@link KafkaConsumerConfig#consumerFactory(String)} pero que
-	 * va a procesar un pojo {@link CustomMessage} en vez de una {@link String}
+	 * va a procesar un pojo {@link Message} en vez de una {@link String}
 	 * 
 	 * @param bootstrapAddress valor de la property <b>kafka.bootstrapAddress</b>
 	 *                         inyectada desde el application.properties
 	 * 
-	 * @return {@link ConsumerFactory} < {@link String} , {@link CustomMessage} >
+	 * @return {@link ConsumerFactory} < {@link String} , {@link Message} >
 	 *         configurado
 	 */
 	@Bean
-	public ConsumerFactory<String, CustomMessage> consumerFactoryWithPojo() {
+	public ConsumerFactory<String, MessageLog> consumerFactoryWithPojo() {
 
 		Map<String, Object> properties = createKafkaProperties();
 
 		return new DefaultKafkaConsumerFactory<>(properties, new StringDeserializer(),
-		        new JsonDeserializer<>(CustomMessage.class));
+		        new JsonDeserializer<>(MessageLog.class));
 	}
 
 	/**
@@ -176,13 +176,13 @@ public class KafkaConsumerConfig {
 	 *                        {@link KafkaConsumerConfig#consumerFactoryWithPojo(String)}
 	 *                        <p>
 	 * @return {@link ConcurrentKafkaListenerContainerFactory} < {@link String} ,
-	 *         {@link CustomMessage} > configurado
+	 *         {@link Message} > configurado
 	 */
 	@Bean
-	public ConcurrentKafkaListenerContainerFactory<String, CustomMessage> kafkaListenerContainerFactoryWithPojo(
-	        ConsumerFactory<String, CustomMessage> consumerFactory) {
+	public ConcurrentKafkaListenerContainerFactory<String, MessageLog> kafkaListenerContainerFactoryWithPojo(
+	        ConsumerFactory<String, MessageLog> consumerFactory) {
 
-		ConcurrentKafkaListenerContainerFactory<String, CustomMessage> factory = new ConcurrentKafkaListenerContainerFactory<>();
+		ConcurrentKafkaListenerContainerFactory<String, MessageLog> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(consumerFactory);
 		return factory;
 	}
