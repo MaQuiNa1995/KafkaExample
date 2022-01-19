@@ -1,5 +1,8 @@
 Para poder ejecutar este ejemplo debes montar una instancia de Zookeeper y kafka los pasos a seguir son los siguientes
 
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/1021dba8f6eb4a0694405956c43878a6)](https://www.codacy.com/gh/MaQuiNa1995/KafkaExample/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=MaQuiNa1995/KafkaExample&amp;utm_campaign=Badge_Grade)
+[![Codacy Badge](https://app.codacy.com/project/badge/Coverage/1021dba8f6eb4a0694405956c43878a6)](https://www.codacy.com/gh/MaQuiNa1995/KafkaExample/dashboard?utm_source=github.com&utm_medium=referral&utm_content=MaQuiNa1995/KafkaExample&utm_campaign=Badge_Coverage)
+
 # Docker
 
 Si quieres usar docker y no hacer la instalación en tu máquina puedes usar este dockerfile para a traves de docker montar un kafka y zookeeper sino digue leyendo :)
