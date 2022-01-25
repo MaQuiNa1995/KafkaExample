@@ -6,16 +6,15 @@ import java.util.Map;
 import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringBootConfiguration;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.kafka.config.TopicBuilder;
-import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.KafkaAdmin;
-import org.springframework.kafka.listener.adapter.RecordFilterStrategy;
 
 import com.github.maquina1995.constants.KafkaConstants;
-import com.github.maquina1995.entity.MessageLog;
 
 /**
  * Para crear <b>topics de kafka</b> podemos recurrir a 2 estrategias:
@@ -36,7 +35,10 @@ import com.github.maquina1995.entity.MessageLog;
  * @author MaQuiNa1995
  *
  */
-@Configuration
+@SpringBootConfiguration
+@EnableJpaRepositories
+@EntityScan
+@ComponentScan
 public class KafkaTopicConfig {
 
 	/**
@@ -65,10 +67,7 @@ public class KafkaTopicConfig {
 	 */
 	@Bean
 	public NewTopic topic1() {
-		return TopicBuilder.name(KafkaConstants.KAFKA_TOPIC_NAME)
-		        .partitions(1)
-		        .replicas(1)
-		        .build();
+		return TopicBuilder.name(KafkaConstants.KAFKA_TOPIC_NAME).partitions(1).replicas(1).build();
 	}
 
 	/**
@@ -79,69 +78,7 @@ public class KafkaTopicConfig {
 	 */
 	@Bean
 	public NewTopic topic2() {
-		return TopicBuilder.name(KafkaConstants.KAFKA_TOPIC_NAME_WITH_FILTER)
-		        .partitions(1)
-		        .replicas(1)
-		        .build();
+		return TopicBuilder.name(KafkaConstants.KAFKA_TOPIC_NAME_WITH_FILTER).partitions(1).replicas(1).build();
 	}
 
-	/**
-	 * Configura el {@link ConsumerFactory} inyectado en spring para definir una/s
-	 * determinadas reglas de filtrado
-	 * <p>
-	 * En este caso la regla está definida en:
-	 * {@link KafkaTopicConfig#createCustomRecordFilterStrategy()}
-	 * <p>
-	 * Se ha configurado una regla de cargado del bean para que cuando esté la
-	 * property <b>custom.filter.enabled<b> a <b>true<b> se inyecte al contexto
-	 * 
-	 * @param consumerFactory {@link ConsumerFactory}< {@link String},
-	 *                        {@link String} > inyectado en el contexto desde
-	 *                        {@link KafkaConsumerConfig#consumerFactoryWithFilter(String)}
-	 *                        <p>
-	 * @return {@link ConcurrentKafkaListenerContainerFactory} configurado
-	 */
-	@Bean
-	public ConcurrentKafkaListenerContainerFactory<String, String> filterKafkaListenerContainerFactory(
-	        ConsumerFactory<String, String> consumerFactoryWithFilter) {
-
-		ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
-		factory.setConsumerFactory(consumerFactoryWithFilter);
-		factory.setRecordFilterStrategy(this.createCustomRecordFilterStrategy());
-		return factory;
-	}
-
-	/**
-	 * Configura el {@link ConsumerFactory} inyectado en spring para definir una/s
-	 * determinadas reglas de filtrado
-	 * <p>
-	 * En este caso la regla está definida en:
-	 * {@link KafkaTopicConfig#createCustomRecordFilterStrategy()}
-	 * 
-	 * @param consumerFactory {@link ConsumerFactory}< {@link String},
-	 *                        {@link MessageLog} > inyectado en el contexto desde
-	 *                        {@link KafkaConsumerConfig#consumerFactoryWithPojo(String)}
-	 *                        <p>
-	 * @return {@link ConcurrentKafkaListenerContainerFactory} configurado
-	 */
-	@Bean
-	public ConcurrentKafkaListenerContainerFactory<String, MessageLog> pojoKafkaListenerContainerFactory(
-	        ConsumerFactory<String, MessageLog> consumerFactoryWithPojo) {
-
-		ConcurrentKafkaListenerContainerFactory<String, MessageLog> factory = new ConcurrentKafkaListenerContainerFactory<>();
-		factory.setConsumerFactory(consumerFactoryWithPojo);
-		return factory;
-	}
-
-	/**
-	 * Este método crea una estrategia de filtrado en el que se descarta los casos
-	 * positivos de una determinada condición
-	 * <p>
-	 * En este caso los mensajes que cumplan la condición se descartarían
-	 * 
-	 * @return {@link RecordFilterStrategy}< String, String > configurado
-	 */
-	private RecordFilterStrategy<String, String> createCustomRecordFilterStrategy() {
-		return kafkaRecord -> !"Mensaje asincrono con logica de filtrado".equals(kafkaRecord.value());
-	}
 }

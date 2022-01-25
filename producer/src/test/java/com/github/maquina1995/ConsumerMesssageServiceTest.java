@@ -4,19 +4,23 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 
+import com.github.maquina1995.configuration.KafkaConsumerConfig;
+import com.github.maquina1995.configuration.KafkaTopicConfig;
 import com.github.maquina1995.constants.KafkaConstants;
 import com.github.maquina1995.entity.MessageLog;
+import com.github.maquina1995.producer.configuration.KafkaProducerConfig;
 import com.github.maquina1995.repository.MessageLogRepository;
 
 @EnableKafka
-@SpringBootTest
-@EmbeddedKafka(partitions = 1,
-        controlledShutdown = true,
-        brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" }
+@EnableJpaRepositories
+@SpringBootTest(classes = { KafkaTopicConfig.class, KafkaProducerConfig.class, KafkaConsumerConfig.class })
+@EmbeddedKafka(partitions = 1, controlledShutdown = true, brokerProperties = { "listeners=PLAINTEXT://localhost:9092",
+		"port=9092" }
 // ,topics = { KafkaConstants.KAFKA_TOPIC_NAME_WITH_POJO }
 )
 class ConsumerMesssageServiceTest {
@@ -37,9 +41,7 @@ class ConsumerMesssageServiceTest {
 		template.send(KafkaConstants.KAFKA_TOPIC_NAME_WITH_POJO, customMessage);
 
 		// Then
-		messageLogRepository.findAll();
-		Assertions.assertTrue(messageLogRepository.findByMessage("test")
-		        .isPresent());
+		Assertions.assertTrue(messageLogRepository.findByMessage("test").isPresent());
 
 	}
 }

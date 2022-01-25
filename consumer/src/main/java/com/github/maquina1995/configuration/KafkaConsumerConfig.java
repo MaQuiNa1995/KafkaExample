@@ -6,12 +6,13 @@ import java.util.Map;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
+import org.springframework.kafka.listener.adapter.RecordFilterStrategy;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import com.github.maquina1995.constants.KafkaConstants;
@@ -61,7 +62,7 @@ import com.github.maquina1995.service.ConsumerMesssageService;
  * @author MaQuiNa1995
  *
  */
-@Configuration
+@SpringBootConfiguration
 @EnableKafka
 public class KafkaConsumerConfig {
 
@@ -101,7 +102,7 @@ public class KafkaConsumerConfig {
 	 */
 	@Bean
 	public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory(
-	        ConsumerFactory<String, String> consumerFactory) {
+			ConsumerFactory<String, String> consumerFactory) {
 
 		ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(consumerFactory);
@@ -140,7 +141,7 @@ public class KafkaConsumerConfig {
 	 */
 	@Bean
 	public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactoryWithFilter(
-	        ConsumerFactory<String, String> consumerFactory) {
+			ConsumerFactory<String, String> consumerFactory) {
 
 		ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(consumerFactory);
@@ -166,7 +167,7 @@ public class KafkaConsumerConfig {
 		Map<String, Object> properties = createKafkaProperties();
 
 		return new DefaultKafkaConsumerFactory<>(properties, new StringDeserializer(),
-		        new JsonDeserializer<>(MessageLog.class));
+				new JsonDeserializer<>(MessageLog.class));
 	}
 
 	/**
@@ -180,11 +181,71 @@ public class KafkaConsumerConfig {
 	 */
 	@Bean
 	public ConcurrentKafkaListenerContainerFactory<String, MessageLog> kafkaListenerContainerFactoryWithPojo(
-	        ConsumerFactory<String, MessageLog> consumerFactory) {
+			ConsumerFactory<String, MessageLog> consumerFactory) {
 
 		ConcurrentKafkaListenerContainerFactory<String, MessageLog> factory = new ConcurrentKafkaListenerContainerFactory<>();
 		factory.setConsumerFactory(consumerFactory);
 		return factory;
+	}
+
+	/**
+	 * Configura el {@link ConsumerFactory} inyectado en spring para definir una/s
+	 * determinadas reglas de filtrado
+	 * <p>
+	 * En este caso la regla está definida en:
+	 * {@link KafkaTopicConfig#createCustomRecordFilterStrategy()}
+	 * <p>
+	 * Se ha configurado una regla de cargado del bean para que cuando esté la
+	 * property <b>custom.filter.enabled<b> a <b>true<b> se inyecte al contexto
+	 * 
+	 * @param consumerFactory {@link ConsumerFactory}< {@link String},
+	 *                        {@link String} > inyectado en el contexto desde
+	 *                        {@link KafkaConsumerConfig#consumerFactoryWithFilter(String)}
+	 *                        <p>
+	 * @return {@link ConcurrentKafkaListenerContainerFactory} configurado
+	 */
+	@Bean
+	public ConcurrentKafkaListenerContainerFactory<String, String> filterKafkaListenerContainerFactory(
+			ConsumerFactory<String, String> consumerFactoryWithFilter) {
+
+		ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
+		factory.setConsumerFactory(consumerFactoryWithFilter);
+		factory.setRecordFilterStrategy(this.createCustomRecordFilterStrategy());
+		return factory;
+	}
+
+	/**
+	 * Configura el {@link ConsumerFactory} inyectado en spring para definir una/s
+	 * determinadas reglas de filtrado
+	 * <p>
+	 * En este caso la regla está definida en:
+	 * {@link KafkaTopicConfig#createCustomRecordFilterStrategy()}
+	 * 
+	 * @param consumerFactory {@link ConsumerFactory}< {@link String},
+	 *                        {@link MessageLog} > inyectado en el contexto desde
+	 *                        {@link KafkaConsumerConfig#consumerFactoryWithPojo(String)}
+	 *                        <p>
+	 * @return {@link ConcurrentKafkaListenerContainerFactory} configurado
+	 */
+	@Bean
+	public ConcurrentKafkaListenerContainerFactory<String, MessageLog> pojoKafkaListenerContainerFactory(
+			ConsumerFactory<String, MessageLog> consumerFactoryWithPojo) {
+
+		ConcurrentKafkaListenerContainerFactory<String, MessageLog> factory = new ConcurrentKafkaListenerContainerFactory<>();
+		factory.setConsumerFactory(consumerFactoryWithPojo);
+		return factory;
+	}
+
+	/**
+	 * Este método crea una estrategia de filtrado en el que se descarta los casos
+	 * positivos de una determinada condición
+	 * <p>
+	 * En este caso los mensajes que cumplan la condición se descartarían
+	 * 
+	 * @return {@link RecordFilterStrategy}< String, String > configurado
+	 */
+	private RecordFilterStrategy<String, String> createCustomRecordFilterStrategy() {
+		return kafkaRecord -> !"Mensaje asincrono con logica de filtrado".equals(kafkaRecord.value());
 	}
 
 	/**
