@@ -5,7 +5,7 @@ Para poder ejecutar este ejemplo debes montar una instancia de Zookeeper y kafka
 
 # Diagrama Uml del proyecto
 
-![alt text](https://github.com/MaQuiNa1995/KafkaExample/blob/master/diagramaUml.svg?raw=true)
+![alt text](https://github.com/MaQuiNa1995/KafkaExample/blob/master/DiagramaUml.svg?raw=true)
 
 # Docker
 
