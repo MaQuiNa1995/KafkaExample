@@ -7,10 +7,7 @@ import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringBootConfiguration;
-import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.KafkaAdmin;
 
@@ -36,9 +33,6 @@ import com.github.maquina1995.constants.KafkaConstants;
  *
  */
 @SpringBootConfiguration
-@EnableJpaRepositories
-@EntityScan
-@ComponentScan
 public class KafkaTopicConfig {
 
 	/**
@@ -67,7 +61,7 @@ public class KafkaTopicConfig {
 	 */
 	@Bean
 	public NewTopic topic1() {
-		return TopicBuilder.name(KafkaConstants.KAFKA_TOPIC_NAME).partitions(1).replicas(1).build();
+		return TopicBuilder.name(KafkaConstants.KAFKA_TOPIC_STRING_STRING).partitions(1).replicas(1).build();
 	}
 
 	/**
@@ -78,7 +72,8 @@ public class KafkaTopicConfig {
 	 */
 	@Bean
 	public NewTopic topic2() {
-		return TopicBuilder.name(KafkaConstants.KAFKA_TOPIC_NAME_WITH_FILTER).partitions(1).replicas(1).build();
+		return TopicBuilder.name(KafkaConstants.KAFKA_TOPIC_STRING_STRING_WITH_FILTER).partitions(1).replicas(1)
+				.build();
 	}
 
 }

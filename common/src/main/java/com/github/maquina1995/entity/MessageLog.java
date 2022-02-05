@@ -2,37 +2,27 @@ package com.github.maquina1995.entity;
 
 import java.time.LocalDateTime;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
-
-import org.hibernate.annotations.CreationTimestamp;
-
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Builder.Default;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.ToString;
 
-@Entity
+/**
+ * {@link NoArgsConstructor} Necesario para la deserialización de kafka
+ */
 @Getter
-@Setter
+@EqualsAndHashCode
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
+@ToString
 public class MessageLog {
 
-	@Id
-	@GeneratedValue(generator = "messageSequence",
-	        strategy = GenerationType.SEQUENCE)
-	@SequenceGenerator(name = "messageSequence",
-	        allocationSize = 1)
-	private Long id;
 	private String message;
-	@CreationTimestamp
-	private LocalDateTime creationTime;
-
-	public MessageLog(String message) {
-		super();
-		this.message = message;
-	}
+	@Default
+	private LocalDateTime creationTime = LocalDateTime.now();
 
 }
