@@ -92,7 +92,7 @@ public class ProducerMessageService {
 			throws InterruptedException, ExecutionException {
 
 		ListenableFuture<SendResult<String, String>> listenableFuture = kafkaTemplate
-				.send(KafkaConstants.KAFKA_TOPIC_NAME, synchronousMessage);
+				.send(KafkaConstants.KAFKA_TOPIC_STRING_STRING, synchronousMessage);
 
 		SendResult<String, String> synchronousResult = listenableFuture.get();
 

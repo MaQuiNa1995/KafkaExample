@@ -17,11 +17,6 @@
 			<artifactId>common</artifactId>
 			<version>1.0.0</version>
 		</dependency>
-		<dependency>
-			<groupId>com.github.maquina1995</groupId>
-			<artifactId>consumer</artifactId>
-			<version>1.0.0</version>
-		</dependency>
 	</dependencies>
 
 </project>

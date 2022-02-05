@@ -29,19 +29,19 @@ public class Main implements CommandLineRunner {
 	}
 
 	private void sendPojo() {
-		MessageLog customMessage = new MessageLog("Mensaje asincrono contenido en un pojo");
+		MessageLog customMessage = MessageLog.builder().message("Mensaje asincrono contenido en un pojo").build();
 
-		log.info("Envío de pojo asíncrono con topic: " + KafkaConstants.KAFKA_TOPIC_NAME_WITH_POJO);
-		sendMessageService.sendAsynchronousPojoMessage(customMessage, KafkaConstants.KAFKA_TOPIC_NAME_WITH_POJO);
+		log.info("Envío de pojo asíncrono con topic: " + KafkaConstants.KAFKA_TOPIC_STRING_POJO);
+		sendMessageService.sendAsynchronousPojoMessage(customMessage, KafkaConstants.KAFKA_TOPIC_STRING_POJO);
 	}
 
 	private void sendString() {
-		log.info("Envío mensaje String asíncrono con topic: " + KafkaConstants.KAFKA_TOPIC_NAME);
-		sendMessageService.sendAsynchronousStringMessage("Mensaje asincrono", KafkaConstants.KAFKA_TOPIC_NAME);
+		log.info("Envío mensaje String asíncrono con topic: " + KafkaConstants.KAFKA_TOPIC_STRING_STRING);
+		sendMessageService.sendAsynchronousStringMessage("Mensaje asincrono", KafkaConstants.KAFKA_TOPIC_STRING_STRING);
 
-		log.info("Envío mensaje String asíncrono con topic: " + KafkaConstants.KAFKA_TOPIC_NAME_WITH_FILTER);
+		log.info("Envío mensaje String asíncrono con topic: " + KafkaConstants.KAFKA_TOPIC_STRING_STRING_WITH_FILTER);
 		sendMessageService.sendAsynchronousStringMessage("Mensaje asincrono con logica de filtrado",
-				KafkaConstants.KAFKA_TOPIC_NAME_WITH_FILTER);
+				KafkaConstants.KAFKA_TOPIC_STRING_STRING_WITH_FILTER);
 	}
 
 }

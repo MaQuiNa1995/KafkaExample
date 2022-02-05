@@ -41,7 +41,7 @@ public class KafkaProducerConfig {
 	 */
 	@Bean
 	public ProducerFactory<String, String> producerFactory(
-	        @Value(value = "${kafka.bootstrapAddress}") String bootstrapAddress) {
+			@Value(value = "${kafka.bootstrapAddress}") String bootstrapAddress) {
 
 		Map<String, Object> configProps = new HashMap<>(3);
 		configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
@@ -80,7 +80,7 @@ public class KafkaProducerConfig {
 	 */
 	@Bean
 	public ProducerFactory<String, MessageLog> customPojoProducerFactory(
-	        @Value(value = "${kafka.bootstrapAddress}") String bootstrapAddress) {
+			@Value(value = "${kafka.bootstrapAddress}") String bootstrapAddress) {
 
 		Map<String, Object> configProps = new HashMap<>(3);
 		configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapAddress);
@@ -100,7 +100,7 @@ public class KafkaProducerConfig {
 	 */
 	@Bean
 	public KafkaTemplate<String, MessageLog> kafkaTemplateWithCustomPojo(
-	        ProducerFactory<String, MessageLog> producerFactory) {
+			ProducerFactory<String, MessageLog> producerFactory) {
 		return new KafkaTemplate<>(producerFactory);
 	}
 }

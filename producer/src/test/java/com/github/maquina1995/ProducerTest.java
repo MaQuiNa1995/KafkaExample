@@ -1,88 +1,138 @@
 package com.github.maquina1995;
 
+import java.util.List;
+import java.util.Map;
+
+import org.apache.kafka.clients.consumer.Consumer;
+import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.serialization.StringDeserializer;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.kafka.test.utils.KafkaTestUtils;
 
-import com.github.maquina1995.configuration.KafkaConsumerConfig;
 import com.github.maquina1995.configuration.KafkaTopicConfig;
 import com.github.maquina1995.constants.KafkaConstants;
 import com.github.maquina1995.entity.MessageLog;
 import com.github.maquina1995.producer.configuration.KafkaProducerConfig;
-import com.github.maquina1995.repository.MessageLogRepository;
 
-@EnableKafka
-@EnableJpaRepositories
-@SpringBootTest(classes = { KafkaTopicConfig.class, KafkaProducerConfig.class, KafkaConsumerConfig.class })
-@EmbeddedKafka(partitions = 1, controlledShutdown = true, brokerProperties = { "listeners=PLAINTEXT://localhost:9092",
-		"port=9092" }
-// ,topics = { KafkaConstants.KAFKA_TOPIC_NAME_WITH_POJO }
-)
-class ConsumerMesssageServiceTest {
+@EmbeddedKafka(partitions = 1, ports = 9092)
+@SpringBootTest(classes = { KafkaTopicConfig.class, KafkaProducerConfig.class })
+class ProducerTest {
 
 	@Autowired
-	private MessageLogRepository messageLogRepository;
+	private EmbeddedKafkaBroker embeddedKafkaBroker;
 
 	@Autowired
-	private KafkaTemplate<String, MessageLog> template;
+	private KafkaTemplate<String, String> producerStringString;
+
+	@Autowired
+	private KafkaTemplate<String, MessageLog> producerStringPojo;
 
 	@Test
-	void consumerListenerTest() throws Exception {
+	void testProducerStringString() {
 
 		// Given
-		MessageLog customMessage = new MessageLog("test");
+		String key = "key";
+		String value = "value";
 
-		// When
-		template.send(KafkaConstants.KAFKA_TOPIC_NAME_WITH_POJO, customMessage);
+		try (Consumer<String, String> consumer = this.configureConsumerStringString()) {
 
-		// Then
-		Assertions.assertTrue(messageLogRepository.findByMessage("test").isPresent());
+			// When
+			producerStringString.send(new ProducerRecord<>(KafkaConstants.KAFKA_TOPIC_STRING_STRING, key, value));
 
+			// Then
+			ConsumerRecord<String, String> singleRecord = KafkaTestUtils.getSingleRecord(consumer,
+					KafkaConstants.KAFKA_TOPIC_STRING_STRING);
+			Assertions.assertNotNull(singleRecord);
+			Assertions.assertEquals(singleRecord.key(), key);
+			Assertions.assertEquals(singleRecord.value(), value);
+		}
+	}
+
+	@Test
+	void testProducerStringPojo() {
+
+		// Given
+		String key = "key";
+		MessageLog messageLog = MessageLog.builder().message("mensaje").build();
+
+		try (Consumer<String, MessageLog> consumer = this.configureConsumerStringPojo()) {
+
+			// When
+			producerStringPojo.send(new ProducerRecord<>(KafkaConstants.KAFKA_TOPIC_STRING_POJO, key, messageLog));
+
+			// Then
+			ConsumerRecord<String, MessageLog> singleRecord = KafkaTestUtils.getSingleRecord(consumer,
+					KafkaConstants.KAFKA_TOPIC_STRING_POJO);
+			Assertions.assertNotNull(singleRecord);
+			Assertions.assertEquals(singleRecord.key(), key);
+			Assertions.assertEquals(singleRecord.value(), messageLog);
+		}
+	}
+
+	@Test
+	void testProducerStringStringFilter() {
+
+		// Given
+		String key = "key";
+		String value = "value";
+
+		try (Consumer<String, String> consumer = this.configureConsumerStringString()) {
+
+			// When
+			producerStringString
+					.send(new ProducerRecord<>(KafkaConstants.KAFKA_TOPIC_STRING_STRING_WITH_FILTER, key, value));
+
+			// Then
+			ConsumerRecord<String, String> singleRecord = KafkaTestUtils.getSingleRecord(consumer,
+					KafkaConstants.KAFKA_TOPIC_STRING_STRING_WITH_FILTER);
+			Assertions.assertNotNull(singleRecord);
+			Assertions.assertEquals(singleRecord.key(), key);
+			Assertions.assertEquals(singleRecord.value(), value);
+		}
+	}
+
+	private Consumer<String, String> configureConsumerStringString() {
+		Map<String, Object> consumerProps = KafkaTestUtils.consumerProps(KafkaConstants.KAFKA_GROUP_ID, "true",
+				embeddedKafkaBroker);
+		consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+		consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+		consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+
+		Consumer<String, String> consumer = new DefaultKafkaConsumerFactory<String, String>(consumerProps)
+				.createConsumer();
+
+		// Como uso este consumer para 2 test ya que son iguales uno con filtrado y otro
+		// sin el pongo aqui los 2 topics
+		// En este proyecto del producer al no tener acceso al consumidor como tal
+		// (recuerda que tiene lógica de filtrado) este test se queda igual que el de un
+		// String String normal
+		consumer.subscribe(List.of(KafkaConstants.KAFKA_TOPIC_STRING_STRING,
+				KafkaConstants.KAFKA_TOPIC_STRING_STRING_WITH_FILTER));
+		return consumer;
+	}
+
+	private Consumer<String, MessageLog> configureConsumerStringPojo() {
+		Map<String, Object> consumerProps = KafkaTestUtils.consumerProps(KafkaConstants.KAFKA_GROUP_ID, "true",
+				embeddedKafkaBroker);
+		consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+		consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+		consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+		consumerProps.put(JsonDeserializer.TRUSTED_PACKAGES, "com.github.maquina1995.entity");
+
+		Consumer<String, MessageLog> consumer = new DefaultKafkaConsumerFactory<String, MessageLog>(consumerProps)
+				.createConsumer();
+
+		consumer.subscribe(List.of(KafkaConstants.KAFKA_TOPIC_STRING_POJO));
+		return consumer;
 	}
 }
-//@EmbeddedKafka(partitions = 1,
-//        controlledShutdown = false,
-//        brokerProperties = { "listeners=PLAINTEXT://localhost:9092", "port=9092" },
-//        topics = { "testTopic" })
-//@SpringBootTest
-//class SimpleKafkaTest {
-//
-//	private static final String TEST_TOPIC = "testTopic";
-//
-//	@Autowired
-//	private EmbeddedKafkaBroker embeddedKafkaBroker;
-//
-//	@Test
-//	void testReceivingKafkaEvents() {
-//
-//		try (Consumer<Integer, String> consumer = configureConsumer();
-//		        Producer<Integer, String> producer = configureProducer()) {
-//
-//			producer.send(new ProducerRecord<>(TEST_TOPIC, 123, "my-test-value"));
-//
-//			ConsumerRecord<Integer, String> singleRecord = KafkaTestUtils.getSingleRecord(consumer, TEST_TOPIC);
-//			Assertions.assertNotNull(singleRecord);
-//			Assertions.assertEquals(123, singleRecord.key());
-//			Assertions.assertEquals("my-test-value", singleRecord.value());
-//		}
-//	}
-//
-//	private Consumer<Integer, String> configureConsumer() {
-//		Map<String, Object> consumerProps = KafkaTestUtils.consumerProps("testGroup", "true", embeddedKafkaBroker);
-//		consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
-//		Consumer<Integer, String> consumer = new DefaultKafkaConsumerFactory<Integer, String>(consumerProps)
-//		        .createConsumer();
-//		consumer.subscribe(Collections.singleton(TEST_TOPIC));
-//		return consumer;
-//	}
-//
-//	private Producer<Integer, String> configureProducer() {
-//		Map<String, Object> producerProps = new HashMap<>(KafkaTestUtils.producerProps(embeddedKafkaBroker));
-//		return new DefaultKafkaProducerFactory<Integer, String>(producerProps).createProducer();
-//	}
-//}
