@@ -30,6 +30,7 @@ import com.github.maquina1995.listener.AbstractListener;
 @EnableKafka
 @ComponentScan(basePackages = "com.github.maquina1995")
 @SpringBootTest(classes = { Main.class })
+//@TestInstance(value = Lifecycle.PER_METHOD)
 class ConsumerTest {
 
 	@Autowired
@@ -46,15 +47,15 @@ class ConsumerTest {
 	void testConsumerStringString() throws InterruptedException {
 
 		// Given
-		String key = "key";
-		String value = "value";
+		String key = "key1";
+		String value = "value1";
 
 		try (Producer<String, String> producer = this.configureProducerStringString()) {
 
 			// When
 			producer.send(new ProducerRecord<>(KafkaConstants.KAFKA_TOPIC_STRING_STRING, key, value));
 
-			listenerStringString.getLatch().await(2, TimeUnit.SECONDS);
+			listenerStringString.getLatch().await(3, TimeUnit.SECONDS);
 
 			Assertions.assertEquals(9L, listenerStringString.getLatch().getCount());
 			Assertions.assertEquals(value, listenerStringString.getPayload());
@@ -65,15 +66,15 @@ class ConsumerTest {
 	void testConsumerStringStringWithFilter() throws InterruptedException {
 
 		// Given
-		String key = "key";
-		String value = "value";
+		String key = "key2";
+		String value = "value2";
 
 		try (Producer<String, String> producer = this.configureProducerStringStringWithFilter()) {
 
 			// When
 			producer.send(new ProducerRecord<>(KafkaConstants.KAFKA_TOPIC_STRING_STRING_FILTER, key, value));
 
-			listenerStringString.getLatch().await(2, TimeUnit.SECONDS);
+			listenerStringString.getLatch().await(3, TimeUnit.SECONDS);
 
 			Assertions.assertEquals(9L, listenerStringString.getLatch().getCount());
 			Assertions.assertEquals(value, listenerStringString.getPayload());
@@ -84,7 +85,7 @@ class ConsumerTest {
 	void testConsumerStringPojo() throws InterruptedException {
 
 		// Given
-		String key = "key";
+		String key = "key3";
 		MessageLog message = MessageLog.builder().message("mensaje").build();
 
 		try (Producer<String, MessageLog> producer = this.configureProducerStringPojo()) {
@@ -93,6 +94,7 @@ class ConsumerTest {
 			producer.send(new ProducerRecord<>(KafkaConstants.KAFKA_TOPIC_STRING_POJO, key, message));
 
 			listenerStringString.getLatch().await(3, TimeUnit.SECONDS);
+
 			Assertions.assertEquals(9L, listenerStringString.getLatch().getCount());
 			Assertions.assertEquals(message.getMessage(), listenerStringString.getPayload());
 		}

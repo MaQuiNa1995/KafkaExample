@@ -260,6 +260,10 @@ public class KafkaConsumerConfig {
 		properties.put(ConsumerConfig.GROUP_ID_CONFIG, KafkaConstants.KAFKA_GROUP_ID);
 		properties.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
 		properties.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+		properties.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);
+		properties.put(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG, "10");
+		properties.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
+
 		return properties;
 	}
 }
