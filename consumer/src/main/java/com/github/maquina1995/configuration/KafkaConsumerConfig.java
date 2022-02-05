@@ -6,8 +6,8 @@ import java.util.Map;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
@@ -17,7 +17,6 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 
 import com.github.maquina1995.constants.KafkaConstants;
 import com.github.maquina1995.entity.MessageLog;
-import com.github.maquina1995.service.ConsumerMesssageService;
 
 /**
  * Para poder consumir mensajes de kafka necesitamos crear los siguientes beans
@@ -62,8 +61,7 @@ import com.github.maquina1995.service.ConsumerMesssageService;
  * @author MaQuiNa1995
  *
  */
-@SpringBootConfiguration
-@EnableKafka
+@Configuration
 public class KafkaConsumerConfig {
 
 	@Value(value = "${kafka.bootstrapAddress}")
