@@ -3,6 +3,10 @@ Para poder ejecutar este ejemplo debes montar una instancia de Zookeeper y kafka
 [![Codacy Badge](https://app.codacy.com/project/badge/Grade/1021dba8f6eb4a0694405956c43878a6)](https://www.codacy.com/gh/MaQuiNa1995/KafkaExample/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=MaQuiNa1995/KafkaExample&amp;utm_campaign=Badge_Grade)
 [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/1021dba8f6eb4a0694405956c43878a6)](https://www.codacy.com/gh/MaQuiNa1995/KafkaExample/dashboard?utm_source=github.com&utm_medium=referral&utm_content=MaQuiNa1995/KafkaExample&utm_campaign=Badge_Coverage)
 
+# Diagrama Uml del proyecto
+
+![alt text](https://github.com/MaQuiNa1995/KafkaExample/blob/master/diagramaUml.svg?raw=true)
+
 # Docker
 
 Si quieres usar docker y no hacer la instalación en tu máquina puedes usar este dockerfile para a traves de docker montar un kafka y zookeeper sino digue leyendo :)
@@ -167,9 +171,5 @@ class SimpleKafkaTest {
 [Para hacer la guía](https://jd-bots.com/2021/08/14/start-zookeeper-and-kafka-in-windows-os/)
 
 [Para hacer el proyecto](https://www.baeldung.com/spring-kafka)
-
-# Diagrama Uml del proyecto
-
-![alt text](https://github.com/MaQuiNa1995/KafkaExample/blob/master/DiagramaUml.svg?raw=true)
 
 Imagen creada con: https://github.com/MaQuiNa1995/ExtractorUml
