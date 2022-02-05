@@ -2,6 +2,7 @@ package com.github.maquina1995;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Resource;
@@ -22,6 +23,7 @@ import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 
+import com.github.maquina1995.configuration.KafkaConsumerConfig;
 import com.github.maquina1995.constants.KafkaConstants;
 import com.github.maquina1995.entity.MessageLog;
 import com.github.maquina1995.listener.AbstractListener;
@@ -30,7 +32,6 @@ import com.github.maquina1995.listener.AbstractListener;
 @EnableKafka
 @ComponentScan(basePackages = "com.github.maquina1995")
 @SpringBootTest(classes = { Main.class })
-//@TestInstance(value = Lifecycle.PER_METHOD)
 class ConsumerTest {
 
 	@Autowired
@@ -63,21 +64,48 @@ class ConsumerTest {
 	}
 
 	@Test
-	void testConsumerStringStringWithFilter() throws InterruptedException {
+	void testConsumerStringStringWithValidFilter() throws InterruptedException {
 
 		// Given
 		String key = "key2";
-		String value = "value2";
+
+		CountDownLatch counter = listenerStringStringFilter.getLatch();
+		counter.countDown();
 
 		try (Producer<String, String> producer = this.configureProducerStringStringWithFilter()) {
 
 			// When
-			producer.send(new ProducerRecord<>(KafkaConstants.KAFKA_TOPIC_STRING_STRING_FILTER, key, value));
+			producer.send(new ProducerRecord<>(KafkaConstants.KAFKA_TOPIC_STRING_STRING_WITH_FILTER, key,
+					KafkaConsumerConfig.STRING_TO_FILTER));
 
-			listenerStringString.getLatch().await(3, TimeUnit.SECONDS);
+			listenerStringStringFilter.getLatch().await(3, TimeUnit.SECONDS);
 
-			Assertions.assertEquals(9L, listenerStringString.getLatch().getCount());
-			Assertions.assertEquals(value, listenerStringString.getPayload());
+			// Then
+			// Comprobamos que hubo interaccion exactamente de 1
+			Assertions.assertEquals(counter.getCount(), listenerStringStringFilter.getLatch().getCount());
+			Assertions.assertEquals(KafkaConsumerConfig.STRING_TO_FILTER, listenerStringStringFilter.getPayload());
+		}
+	}
+
+	@Test
+	void testConsumerStringStringWithInValidFilter() throws InterruptedException {
+
+		// Given
+		String key = "key2";
+		String value = "invalidValueToFilter";
+
+		CountDownLatch counter = listenerStringStringFilter.getLatch();
+
+		try (Producer<String, String> producer = this.configureProducerStringStringWithFilter()) {
+
+			// When
+			producer.send(new ProducerRecord<>(KafkaConstants.KAFKA_TOPIC_STRING_STRING_WITH_FILTER, key, value));
+
+			listenerStringStringFilter.getLatch().await(3, TimeUnit.SECONDS);
+
+			// Then
+			// Comprobamos que no hubo interaccion
+			Assertions.assertEquals(counter.getCount(), listenerStringStringFilter.getLatch().getCount());
 		}
 	}
 
@@ -95,8 +123,8 @@ class ConsumerTest {
 
 			listenerStringString.getLatch().await(3, TimeUnit.SECONDS);
 
-			Assertions.assertEquals(9L, listenerStringString.getLatch().getCount());
-			Assertions.assertEquals(message.getMessage(), listenerStringString.getPayload());
+			Assertions.assertEquals(9L, listenerStringPojo.getLatch().getCount());
+			Assertions.assertEquals(message.toString(), listenerStringPojo.getPayload());
 		}
 	}
 

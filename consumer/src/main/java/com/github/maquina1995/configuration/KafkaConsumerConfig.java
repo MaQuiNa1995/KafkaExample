@@ -64,6 +64,8 @@ import com.github.maquina1995.entity.MessageLog;
 @Configuration
 public class KafkaConsumerConfig {
 
+	public static final String STRING_TO_FILTER = "Mensaje asincrono con logica de filtrado";
+
 	@Value(value = "${kafka.bootstrapAddress}")
 	private String bootstrapAddress;
 
@@ -243,7 +245,7 @@ public class KafkaConsumerConfig {
 	 * @return {@link RecordFilterStrategy}< String, String > configurado
 	 */
 	private RecordFilterStrategy<String, String> createCustomRecordFilterStrategy() {
-		return kafkaRecord -> !"Mensaje asincrono con logica de filtrado".equals(kafkaRecord.value());
+		return kafkaRecord -> !STRING_TO_FILTER.equals(kafkaRecord.value());
 	}
 
 	/**

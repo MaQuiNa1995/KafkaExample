@@ -34,7 +34,7 @@ public class StringPojoListener extends AbstractListener {
 	@KafkaListener(topics = KafkaConstants.KAFKA_TOPIC_STRING_POJO, containerFactory = "pojoKafkaListenerContainerFactory")
 	public void greetingListener(MessageLog customMessage) {
 
-		super.processMessage(3, customMessage.getMessage(), KafkaConstants.KAFKA_TOPIC_STRING_POJO);
+		super.processMessage(3, customMessage.toString(), KafkaConstants.KAFKA_TOPIC_STRING_POJO);
 	}
 
 }

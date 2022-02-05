@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Getter
-public class AbstractListener {
+public abstract class AbstractListener {
 
 	protected CountDownLatch latch = new CountDownLatch(10);
 	protected String payload = null;

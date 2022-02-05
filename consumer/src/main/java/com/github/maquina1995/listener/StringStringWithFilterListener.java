@@ -17,10 +17,10 @@ public class StringStringWithFilterListener extends AbstractListener {
 	 * 
 	 * @param message mensaje filtrado recibido
 	 */
-	@KafkaListener(topics = KafkaConstants.KAFKA_TOPIC_STRING_STRING_FILTER, containerFactory = "filterKafkaListenerContainerFactory")
+	@KafkaListener(topics = KafkaConstants.KAFKA_TOPIC_STRING_STRING_WITH_FILTER, containerFactory = "filterKafkaListenerContainerFactory")
 	public void listenWithFilter(String message) {
 
-		super.processMessage(2, message, KafkaConstants.KAFKA_TOPIC_STRING_STRING_FILTER);
+		super.processMessage(2, message, KafkaConstants.KAFKA_TOPIC_STRING_STRING_WITH_FILTER);
 	}
 
 }
